@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -15,6 +16,75 @@ public class App {
     public String bestCharge(List<String> inputs) {
         //TODO: write code here
 
-        return null;
+        List<String> halfPriceItems = Arrays.asList("Braised chicken", "Cold noodles");
+        List<String> deductItems = Arrays.asList("Braised chicken", "Chinese hamburger", "Cold noodles");
+        Item[] item = new Item[3];
+
+        item[0] = new Item("ITEM0001", "Braised chicken", 18);
+        item[1] = new Item("ITEM0013", "Chinese hamburger", 6);
+        item[2] = new Item("ITEM0022", "Cold noodles", 8);
+
+        Double total = 0.00, chickenTotal = 0.00 ,noodleTotal = 0.00 ,burgerTotal = 0.00;
+
+        boolean promo1Flag1 = false;
+        boolean promo1Flag2 = false;
+
+        SalesPromotion promo1 = new SalesPromotion("half","Half price for certain dishes (Braised " +
+                "chicken，Cold noodles)，saving ", halfPriceItems);
+        SalesPromotion promo2 = new SalesPromotion("deduct","Deduct 6 yuan when the order reaches 30 yuan, saving 6 yuan\n", deductItems);
+
+
+        String bestCharge = "============= Order details =============\n";
+
+
+        for (int i = 0; i < inputs.size(); i++) {
+            String convertToString = inputs.get(i);
+            String[] splitString = convertToString.split(" ");
+            double convertToDouble = Double.parseDouble(splitString[splitString.length-1]);
+
+            if(splitString[0].equals(item[0].getId())) {
+                bestCharge = bestCharge + item[0].getName() + " x " + splitString[splitString.length-1] + " = "
+                        + String.format("%.0f", convertToDouble * item[0].getPrice()) + " yuan\n";
+                promo1Flag1 = true;
+                chickenTotal = convertToDouble * item[0].getPrice();
+            } else if (splitString[0].equals(item[2].getId())) {
+                bestCharge = bestCharge + item[2].getName() + " x " + splitString[splitString.length-1] + " = "
+                        + String.format("%.0f",convertToDouble * item[2].getPrice()) + " yuan\n";
+                promo1Flag2 = true;
+                noodleTotal = convertToDouble * item[2].getPrice();
+            }
+            else {
+                bestCharge = bestCharge + item[1].getName() + " x " + splitString[splitString.length-1] + " = "
+                        + String.format("%.0f",convertToDouble * item[1].getPrice()) + " yuan\n";
+                burgerTotal = convertToDouble * item[1].getPrice();
+            }
+
+        }
+        bestCharge = bestCharge + "-----------------------------------\n";
+
+        total = chickenTotal + noodleTotal + burgerTotal;
+
+        if(promo1Flag1 == true && promo1Flag2 == true)
+        {
+            bestCharge = bestCharge + "Promotion used:\n";
+            chickenTotal = chickenTotal / 2;
+            noodleTotal = noodleTotal / 2;
+            bestCharge = bestCharge + promo1.getDisplayName() + String.format("%.0f",(chickenTotal+noodleTotal)) + " yuan\n";
+            total = chickenTotal + noodleTotal + burgerTotal;
+            bestCharge = bestCharge + "-----------------------------------\n";
+        }
+
+        if(total>30)
+        {
+            bestCharge = bestCharge + "Promotion used:\n";
+            bestCharge = bestCharge + promo2.getDisplayName();
+            total = total - 6;
+            bestCharge = bestCharge + "-----------------------------------\n";
+        }
+
+        bestCharge = bestCharge + "Total：" + String.format("%.0f",total) + " yuan\n";
+        bestCharge = bestCharge + "===================================";
+
+        return bestCharge;
     }
 }
